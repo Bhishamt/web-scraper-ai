@@ -350,7 +350,7 @@ def backup_database() -> Dict[str, Any]:
         }
 
 
-@celery.app.task(name='monitoring.tasks.check_system_health')
+@celery_app.task(name='monitoring.tasks.check_system_health')
 def check_system_health() -> Dict[str, Any]:
     """Check system health"""
     try:
