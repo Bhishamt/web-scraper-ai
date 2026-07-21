@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 import logging
 import asyncio
+import time
 
 from ..dependencies import get_database, get_current_user, get_scraper_engine, get_data_processor, get_export_engine
 from ..models import (
