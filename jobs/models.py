@@ -92,7 +92,7 @@ class Job(Base):
     # Execution tracking
     created_at = Column(DateTime, default=datetime.utcnow)
     started_at = Column(DateTime, nullable=True)
-    completed_at = DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Results tracking
@@ -166,7 +166,7 @@ class Result(Base):
     job_id = Column(Integer, ForeignKey('jobs.id', ondelete='CASCADE'))
     url = Column(Text, nullable=False)
     raw_data = Column(JSON, nullable=False)
-    processed_data = JSON, nullable=True)
+    processed_data = Column(JSON, nullable=True)
     validation_status = Column(String(50), default='pending')
     validation_errors = Column(JSON, nullable=True)
     checksum = Column(String(64), nullable=True)  # SHA-256 hash
@@ -229,13 +229,13 @@ class Export(Base):
     file_path = Column(Text, nullable=True)
     file_name = Column(String(255), nullable=True)
     file_size = Column(Integer, default=0)
-    record_count = Integer, default=0)
-    download_count = Integer, default=0)
-    is_public = Boolean, default=False)
+    record_count = Column(Integer, default=0)
+    download_count = Column(Integer, default=0)
+    is_public = Column(Boolean, default=False)
     share_token = Column(String(64), unique=True, nullable=True)
-    expires_at = DateTime, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    last_downloaded = DateTime, nullable=True)
+    last_downloaded = Column(DateTime, nullable=True)
     
     # Relationships
     job = relationship("Job", back_populates="job")
@@ -247,14 +247,14 @@ class JobMetrics(Base):
     
     id = Column(Integer, primary_key=True)
     job_id = Column(Integer, ForeignKey('jobs.id', ondelete='CASCADE'))
-    pages_scraped = Integer, default=0)
-    pages_failed = Integer, default=0)
-    data_extracted = Integer, default=0)
-    processing_time = Float, default=0.0)
-    memory_usage = Float, default=0.0)
-    cpu_usage = Float, default=0.0)
-    network_requests = Integer, default=0)
-    error_count = Integer, default=0)
+    pages_scraped = Column(Integer, default=0)
+    pages_failed = Column(Integer, default=0)
+    data_extracted = Column(Integer, default=0)
+    processing_time = Column(Float, default=0.0)
+    memory_usage = Column(Float, default=0.0)
+    cpu_usage = Column(Float, default=0.0)
+    network_requests = Column(Integer, default=0)
+    error_count = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -351,7 +351,7 @@ def get_job_statistics(job_id: int, session) -> Optional[Dict[str, Any]]:
     if not job:
         return None
     
-    metrics = session.query(JobMetrics).filter(Job.job_id == job_id).first()
+    metrics = session.query(JobMetrics).filter(JobMetrics.job_id == job_id).first()
     
     return {
         'job_id': job.id,
@@ -424,7 +424,7 @@ def create_batch_jobs(job_configs: List[Dict[str, Any]]) -> List[Job]:
 # Query helper functions
 def get_jobs_by_tag(tag: str, session, limit: int = 50) -> List[Job]:
     """Get jobs by tag"""
-    return session.query(Job).filter(Job.tags.contains([tag]).limit(limit).all()
+    return session.query(Job).filter(Job.tags.contains([tag])).limit(limit).all()
 
 
 def get_jobs_by_priority(priority: JobPriority, session, limit: int = 50) -> List[Job]:
