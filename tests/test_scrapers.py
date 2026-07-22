@@ -29,7 +29,7 @@ class TestBaseScraper:
         
         scraper = BaseScraper(config)
         
-        assert scraper.config.url == "config.url
+        assert scraper.config.url == config.url
         assert scraper.config.scraper_type == config.scraper_type
         assert scraper.config.selectors == config.selectors
     

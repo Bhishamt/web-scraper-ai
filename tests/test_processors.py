@@ -633,5 +633,5 @@ def example_usage():
     print("Processor tests completed")
 
 
-if __name__name__main__":
+if __name__ == "__main__":
     example_usage()
