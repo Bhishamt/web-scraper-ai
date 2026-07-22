@@ -37,7 +37,7 @@ class JobManager:
         self.max_concurrent_jobs = 10
         self.default_delay = 1.0
         self.max_retries = 3
-        job_timeout = 30
+        self.job_timeout = 30
     
     async def create_job(self, job_config: Union[JobConfig, Dict[str, Any]]) -> Job:
         """Create a new scraping job"""
@@ -265,13 +265,13 @@ class JobManager:
         total_jobs = self.db_session.query(Job).count()
         active_jobs = len(self.active_jobs)
         completed_jobs = self.db_session.query(Job).filter(Job.status == JobStatus.COMPLETED).count()
-        failed_jobs = self.db_session.query(Job.status == JobStatus.FAILED).count()
+        failed_jobs = self.db_session.query(Job).filter(Job.status == JobStatus.FAILED).count()
         
         return {
             'total_jobs': total_jobs,
             'active_jobs': active_jobs,
             'completed_jobs': completed_jobs,
-            'failed_jobs: failed_jobs,
+            'failed_jobs': failed_jobs,
             'success_rate': (completed_jobs / total_jobs * 100) if total_jobs > 0 else 0,
             'uptime': (datetime.utcnow() - self.start_time).total_seconds() / 3600  # hours
         }
@@ -352,7 +352,7 @@ class JobManager:
             return result.file_path
             
         except Exception as e:
-            self.logger.error(f"Failed to export results for job {job_id}: {str(e}")
+            self.logger.error(f"Failed to export results for job {job_id}: {str(e)}")
             return None
     
     def get_job_queue_status(self) -> Dict[str, Any]:
@@ -864,13 +864,13 @@ class ScrapingWorker:
             },
             'logs': {
                 'total_logs': len(logs),
-                'error_logs': len([log for log in logs if log.level in ['ERROR', 'CRITICAL']),
-                'warning_logs': len([log for log in logs if log.level in ['WARNING']),
-                'info_logs': len([log for log in logs if log.level in ['INFO', 'DEBUG'])
+                'error_logs': len([log for log in logs if log.level in ['ERROR', 'CRITICAL']]),
+                'warning_logs': len([log for log in logs if log.level in ['WARNING']]),
+                'info_logs': len([log for log in logs if log.level in ['INFO', 'DEBUG']])
             },
             'recent_errors': [log.message for log in logs if log.level in ['ERROR', 'CRITICAL']][-5:],
-            'recent_warnings': [log.message for log in logs if log.level in ['WARNING']][-5:]],
-            'recent_info': [log.message for log in logs if log.level in ['INFO']][-5:]]
+            'recent_warnings': [log.message for log in logs if log.level in ['WARNING']][-5:],
+            'recent_info': [log.message for log in logs if log.level in ['INFO']][-5:]
             }
         }
     
